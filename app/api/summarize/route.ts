@@ -12,12 +12,14 @@ export async function POST(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { title, content, maxLength = 150 } = await req.json();
+    const body = await req.json();
+    const { title, content, maxLength = 150 } = body;
+
     if (!title || !content) {
       return new NextResponse("Missing fields", { status: 400 });
     }
 
-    // 1. Хэрэглэгчийг өгөгдлийн санд байгаа эсэхийг баталгаажуулах
+    // 1. Хэрэглэгчийг шалгах/үүсгэх (Upsert)
     const dbUser = await prisma.user.upsert({
       where: { clerkId: userId },
       update: {},
@@ -28,7 +30,7 @@ export async function POST(req: Request) {
       },
     });
 
-    // 2. Gemini-г зөв моделоор дуудах (gemini-1.5-flash ашиглах нь хамгийн тогтвортой)
+    // 2. Gemini Model (Нэрийг зөв тогтмол хувилбараар ашиглах)
     const model = genAI.getGenerativeModel({
       model: "gemini-1.5-flash",
     });
@@ -36,38 +38,38 @@ export async function POST(req: Request) {
     const prompt = `Доорх нийтлэлийг ${maxLength} үгнээс хэтрэхгүйгээр монгол хэл дээр хураангуйлж бич:\n\n${content}`;
 
     const result = await model.generateContent(prompt);
-
-    // 3. ХАРИУЛТ АВАХ ХЭСЭГ (Ингэж бичих нь илүү найдвартай)
     const response = await result.response;
     const summary = response.text();
 
     if (!summary) {
-      throw new Error("Gemini failed to generate summary");
+      throw new Error("AI-аас хариу ирсэнгүй");
     }
 
-    // 4. Өгөгдлийн санд хадгалах
+    // 3. Өгөгдлийн санд хадгалах
     const article = await prisma.article.create({
       data: {
         title,
         content,
         summary,
-        userId: dbUser.id, // Энд dbUser-ийн ID-г ашиглаж байна
+        userId: dbUser.id,
       },
     });
 
     return NextResponse.json(article, { status: 201 });
-  } catch (err) {
-    // Алдааг консол дээр харах
-    console.error("FULL ERROR DETAILS:", err);
 
-    // err-ийг Error төрлийнх мөн эсэхийг шалгах
-    const errorMessage =
-      err instanceof Error ? err.message : "Unknown error occurred";
+  } catch (error: unknown) {
+    // TypeScript-ийн алдааг (err: any) биш (error: unknown) гэж засав
+    console.error("SUMMARIZE ERROR:", error);
 
-    if (errorMessage.includes("API_KEY_INVALID")) {
-      return new NextResponse("Invalid Gemini API Key", { status: 500 });
+    let message = "Сервер дээр алдаа гарлаа";
+    if (error instanceof Error) {
+      message = error.message;
     }
 
-    return new NextResponse(`Server error: ${errorMessage}`, { status: 500 });
+    if (message.includes("API_KEY_INVALID")) {
+      return new NextResponse("Gemini API түлхүүр буруу байна", { status: 500 });
+    }
+
+    return new NextResponse(`Алдаа: ${message}`, { status: 500 });
   }
 }
