@@ -30,13 +30,13 @@ export async function POST(req: Request) {
 
     // 2. Gemini-г зөв моделоор дуудах (gemini-1.5-flash ашиглах нь хамгийн тогтвортой)
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash", 
+      model: "gemini-1.5-flash",
     });
 
     const prompt = `Доорх нийтлэлийг ${maxLength} үгнээс хэтрэхгүйгээр монгол хэл дээр хураангуйлж бич:\n\n${content}`;
 
     const result = await model.generateContent(prompt);
-    
+
     // 3. ХАРИУЛТ АВАХ ХЭСЭГ (Ингэж бичих нь илүү найдвартай)
     const response = await result.response;
     const summary = response.text();
@@ -56,16 +56,18 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json(article, { status: 201 });
-
-  } catch (err: any) {
-    // Алдааг консол дээр тодорхой харах
+  } catch (err) {
+    // Алдааг консол дээр харах
     console.error("FULL ERROR DETAILS:", err);
-    
-    // Хэрэв Gemini-ийн API key буруу бол энд мэдэгдэнэ
-    if (err.message?.includes("API_KEY_INVALID")) {
+
+    // err-ийг Error төрлийнх мөн эсэхийг шалгах
+    const errorMessage =
+      err instanceof Error ? err.message : "Unknown error occurred";
+
+    if (errorMessage.includes("API_KEY_INVALID")) {
       return new NextResponse("Invalid Gemini API Key", { status: 500 });
     }
 
-    return new NextResponse(`Server error: ${err.message}`, { status: 500 });
+    return new NextResponse(`Server error: ${errorMessage}`, { status: 500 });
   }
 }
