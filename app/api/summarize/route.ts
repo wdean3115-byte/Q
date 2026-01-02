@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server"; // currentUser нэмэв
 import { prisma } from "@/lib/prisma";
 import { genAI } from "@/lib/openai";
 
 export async function POST(req: Request) {
   try {
     const { userId } = await auth();
+    const user = await currentUser(); // Clerk-ээс хэрэглэгчийн мэдээллийг авах
 
-    if (!userId) {
+    if (!userId || !user) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -16,15 +17,19 @@ export async function POST(req: Request) {
       return new NextResponse("Missing fields", { status: 400 });
     }
 
-    const dbUser = await prisma.user.findUnique({
+    // ЗАСВАР: Upsert ашиглан хэрэглэгчийг шалгах ба байхгүй бол үүсгэх
+    const dbUser = await prisma.user.upsert({
       where: { clerkId: userId },
+      update: {}, // Хэрэв байгаа бол юу ч өөрчлөхгүй
+      create: {
+        clerkId: userId,
+        email: user.emailAddresses[0].emailAddress, // Clerk-ээс имэйлийг нь авах
+        // Хэрэв name талбар байгаа бол:
+        // name: `${user.firstName} ${user.lastName}`,
+      },
     });
 
-    if (!dbUser) {
-      return new NextResponse("User not synced", { status: 409 });
-    }
-
-    // Моделийн нэрийг 1.5-flash болгож засав
+    // ЗАСВАР: Моделийн нэрийг зөв болгох (gemini-1.5-flash эсвэл gemini-2.0-flash)
     const model = genAI.getGenerativeModel({
       model: "gemini-2.5-flash",
     });
