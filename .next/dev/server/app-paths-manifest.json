@@ -1,0 +1,12 @@
+{
+  "/api/articles/[id]/route": "app/api/articles/[id]/route.js",
+  "/api/my-articles/route": "app/api/my-articles/route.js",
+  "/api/quizzes/[id]/route": "app/api/quizzes/[id]/route.js",
+  "/api/quizzes/route": "app/api/quizzes/route.js",
+  "/api/summarize/route": "app/api/summarize/route.js",
+  "/api/users/sync/route": "app/api/users/sync/route.js",
+  "/dashboard/history/[id]/page": "app/dashboard/history/[id]/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/dashboard/quiz/[id]/page": "app/dashboard/quiz/[id]/page.js",
+  "/sign-in/[[...rest]]/page": "app/sign-in/[[...rest]]/page.js"
+}

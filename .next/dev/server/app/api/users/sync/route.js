@@ -1,0 +1,10 @@
+var R=require("../../../../chunks/[turbopack]_runtime.js")("server/app/api/users/sync/route.js")
+R.c("server/chunks/node_modules_ed6e4171._.js")
+R.c("server/chunks/node_modules_next_b579f00b._.js")
+R.c("server/chunks/node_modules_@clerk_backend_dist_a97713e8._.js")
+R.c("server/chunks/node_modules_@clerk_nextjs_dist_esm_87d9d147._.js")
+R.c("server/chunks/[root-of-the-server]__51f448b3._.js")
+R.c("server/chunks/[root-of-the-server]__9a5453f1._.js")
+R.c("server/chunks/_next-internal_server_app_api_users_sync_route_actions_c219ed86.js")
+R.m("[project]/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/app/api/users/sync/route.ts [app-route] (ecmascript)\" } [app-route] (ecmascript)")
+module.exports=R.m("[project]/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/app/api/users/sync/route.ts [app-route] (ecmascript)\" } [app-route] (ecmascript)").exports

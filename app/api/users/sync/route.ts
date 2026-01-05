@@ -1,25 +1,15 @@
 import { NextResponse } from "next/server";
-import { auth, currentUser } from "@clerk/nextjs/server"; // auth болон currentUser ашиглана
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
-export async function POST(_req: Request) {
+export async function POST(req: Request) {
   try {
-    const { userId } = await auth(); // await нэмсэн
+    const { userId } = await auth();
 
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    // Хэрэглэгч баазад аль хэдийн байгаа эсэхийг шалгах
-    const existing = await prisma.user.findUnique({
-      where: { clerkId: userId },
-    });
-
-    if (existing) {
-      return NextResponse.json(existing);
-    }
-
-    // Clerk-ээс хэрэглэгчийн дэлгэрэнгүй мэдээллийг авах
     const clerkUser = await currentUser();
     if (!clerkUser) {
       return new NextResponse("User not found in Clerk", { status: 404 });
@@ -30,16 +20,35 @@ export async function POST(_req: Request) {
       clerkUser.lastName || ""
     }`.trim();
 
-    const user = await prisma.user.create({
-      data: {
+    // The upsert handles the "if exists update, else create" logic automatically
+    const user = await prisma.user.upsert({
+      where: { clerkId: userId },
+      update: {
+        email: email,
+        name: name || null,
+      },
+      create: {
         clerkId: userId,
         email: email,
         name: name || null,
       },
     });
 
-    return NextResponse.json(user, { status: 201 });
-  } catch (err) {
+    return NextResponse.json(user, { status: 200 });
+  } catch (err: unknown) {
+    // Check for Prisma P2002 (Unique constraint failed)
+    if (
+      err &&
+      typeof err === "object" &&
+      "code" in err &&
+      err.code === "P2002"
+    ) {
+      console.error(
+        "Conflict: Email already exists under a different clerkId."
+      );
+      return new NextResponse("Email already in use", { status: 409 });
+    }
+
     console.error("SYNC ERROR:", err);
     return new NextResponse("Internal Server Error", { status: 500 });
   }

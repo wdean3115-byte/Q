@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///Users/25LP5292/Desktop/Q/app/sign-in/%5B%5B...rest%5D%5D/page.tsx"],"sourcesContent":["\"use client\";\n\nimport { SignIn, useUser } from \"@clerk/nextjs\";\nimport { redirect } from \"next/navigation\";\n\nexport default function SignInPage() {\n  const { isSignedIn } = useUser();\n\n  if (isSignedIn) {\n    redirect(\"/dashboard\");\n  }\n\n  return (\n    <div className=\"flex items-center justify-center min-h-screen\">\n      <SignIn />;\n    </div>\n  );\n}\n"],"names":[],"mappings":";;;;;AAEA;AAAA;AACA;AAHA;;;;AAKe,SAAS;IACtB,MAAM,EAAE,UAAU,EAAE,GAAG,IAAA,kLAAO;IAE9B,IAAI,YAAY;QACd,IAAA,8IAAQ,EAAC;IACX;IAEA,qBACE,8OAAC;QAAI,WAAU;;0BACb,8OAAC,gNAAM;;;;;YAAG;;;;;;;AAGhB"}},
+    {"offset": {"line": 41, "column": 0}, "map": {"version":3,"sources":["file:///Users/25LP5292/Desktop/Q/node_modules/next/src/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.ts"],"sourcesContent":["module.exports = (\n  require('../../module.compiled') as typeof import('../../module.compiled')\n).vendored['react-ssr']!.ReactJsxDevRuntime\n"],"names":["module","exports","require","vendored","ReactJsxDevRuntime"],"mappings":"AAAAA,OAAOC,OAAO,GACZC,QAAQ,4HACRC,QAAQ,CAAC,YAAY,CAAEC,kBAAkB","ignoreList":[0]}}]
+}

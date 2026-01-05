@@ -32,7 +32,7 @@ export async function POST(req: Request) {
 
     // 2. Gemini Model (Нэрийг зөв тогтмол хувилбараар ашиглах)
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
+      model: "gemini-2.5-flash",
     });
 
     const prompt = `Доорх нийтлэлийг ${maxLength} үгнээс хэтрэхгүйгээр монгол хэл дээр хураангуйлж бич:\n\n${content}`;
@@ -56,7 +56,6 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json(article, { status: 201 });
-
   } catch (error: unknown) {
     // TypeScript-ийн алдааг (err: any) биш (error: unknown) гэж засав
     console.error("SUMMARIZE ERROR:", error);
@@ -67,7 +66,9 @@ export async function POST(req: Request) {
     }
 
     if (message.includes("API_KEY_INVALID")) {
-      return new NextResponse("Gemini API түлхүүр буруу байна", { status: 500 });
+      return new NextResponse("Gemini API түлхүүр буруу байна", {
+        status: 500,
+      });
     }
 
     return new NextResponse(`Алдаа: ${message}`, { status: 500 });

@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 58, "column": 0}, "map": {"version":3,"sources":["file:///Users/25LP5292/Desktop/Q/proxy.ts"],"sourcesContent":["import { clerkMiddleware, createRouteMatcher } from \"@clerk/nextjs/server\";\n\n// Нэвтрэх шаардлагагүй хуудсууд\nconst isPublicRoute = createRouteMatcher([\"/sign-in(.*)\", \"/sign-up(.*)\", \"/\"]);\n\nexport default clerkMiddleware(async (auth, request) => {\n  if (!isPublicRoute(request)) {\n    await auth.protect(); // auth() биш, шууд auth.protect() ашиглана\n  }\n});\n\nexport const config = {\n  matcher: [\n    // Next.js-ийн дотоод файлууд болон статик файлуудаас бусад бүх хүсэлтийг шалгана\n    \"/((?!_next|[^?]*\\\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)\",\n\n    \"/(api|trpc)(.*)\",\n  ],\n};\n"],"names":[],"mappings":";;;;;;AAAA;AAAA;;AAEA,gCAAgC;AAChC,MAAM,gBAAgB,IAAA,gMAAkB,EAAC;IAAC;IAAgB;IAAgB;CAAI;uCAE/D,IAAA,gMAAe,EAAC,OAAO,MAAM;IAC1C,IAAI,CAAC,cAAc,UAAU;QAC3B,MAAM,KAAK,OAAO,IAAI,2CAA2C;IACnE;AACF;AAEO,MAAM,SAAS;IACpB,SAAS;QACP,iFAAiF;QACjF;QAEA;KACD;AACH"}}]
+}
